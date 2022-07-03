@@ -9,3 +9,5 @@ edition = "2021"
 [dependencies]
 gl = "0.14.0"
 sdl2 = "0.35.2"
+ndarray = "0.15.4"
+rand = "0.8.5"
