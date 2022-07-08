@@ -43,6 +43,11 @@ pub struct PhysicsEngine<'a>{
     grad: Gradient,
    // group_interactions:HashMap<&'a str , Box<dyn Fn(Point,Point)->Point>>,
     dt: f64,
+
+    //cell_size:u32,
+
+    //particle_cell:Vec<Vec<usize>>,
+
 }
 
 
@@ -72,6 +77,12 @@ impl PhysicsEngine<'_>{
 
                 self.objects[index].nacceleration[0] += -(nx-ox)/((nx-ox)*(nx-ox) + 10.0).sqrt();
                 self.objects[index].nacceleration[1] += -(ny-oy)/((ny-oy)*(ny-oy) + 10.0).sqrt();
+
+                if ((nx-ox)*(nx-ox) + (ny-oy)*(ny-oy)).sqrt() < 5.0{
+                    
+                    self.objects[index].nacceleration[0] +=  (nx-ox)/((nx-ox)*(nx-ox)+5.0).sqrt();
+                    self.objects[index].nacceleration[1] +=  (ny-oy)/((ny-oy)*(ny-oy)+5.0).sqrt();
+                }
             }
 
             //println!("{} {}",self.objects[index].nacceleration[0], self.objects[index].nacceleration[1]);
@@ -81,6 +92,30 @@ impl PhysicsEngine<'_>{
 
     pub fn get_positions(&mut self) -> &Vec<PhysicsObject>{
         return &self.objects;
+    }
+
+
+    pub fn update_cell_list(&mut self){
+        
+    }
+
+    pub fn re_center(&mut self){
+        let mut com_x = 0.0;
+        let mut com_y = 0.0;
+
+        for index in 0..self.objects.len(){
+            com_x += self.objects[index].position[0];
+            com_y += self.objects[index].position[1];
+        }
+
+        com_x /= (self.objects.len() as f64);
+        com_y /= (self.objects.len() as f64);
+
+        for index in 0..self.objects.len(){
+            self.objects[index].position[0] += (250.0 - com_x);
+            self.objects[index].position[1] += (250.0 - com_y);
+        }
+
     }
 
 
@@ -110,6 +145,7 @@ impl PhysicsEngine<'_>{
 
     pub fn new(grad:Gradient, dt:f64 ) -> PhysicsEngine<'static>{
         let mut vec = Vec::<PhysicsObject>::new();
+        //let mut vec = vec![Vec::<u32>::new()] // need to know the width and the height of the box
         let mut pe = PhysicsEngine{objects:vec,
             grad:grad,
             dt:dt};
